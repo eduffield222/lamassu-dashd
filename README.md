@@ -1,4 +1,4 @@
-lamassu-bitcoind
+lamassu-dashd
 ==================
 
-bitcoind wallet plugin for Lamassu Bitcoin Machine remote API.
+dashd wallet plugin for Lamassu Bitcoin Machine remote API.

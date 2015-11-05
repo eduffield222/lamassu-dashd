@@ -1,11 +1,11 @@
 'use strict';
 
-var RpcClient = require('bitcore').RpcClient;
+var RpcClient = require('darkcore').RpcClient;
 var fs        = require('fs');
 var _         = require('lodash');
 
 
-exports.NAME = 'Bitcoind';
+exports.NAME = 'Dashd';
 exports.SUPPORTED_MODULES = ['wallet'];
 
 var SATOSHI_FACTOR = 1e8;
@@ -17,12 +17,12 @@ var pluginConfig = {
 
 // TODO: should it happen only once per run, or with each .config() call?
 function initRpc() {
-  var bitcoindConf = parseConf(pluginConfig.bitcoindConfigurationPath);
+  var dashdConf = parseConf(pluginConfig.dashdConfigurationPath);
 
   var rpcConfig = {
     protocol: 'http',
-    user: bitcoindConf.rpcuser,
-    pass: bitcoindConf.rpcpassword
+    user: dashdConf.rpcuser,
+    pass: dashdConf.rpcpassword
   };
 
   rpc = new RpcClient(rpcConfig);
@@ -73,11 +73,11 @@ exports.balance = function balance(callback) {
     if (err) return callback(err);
 
     if (result.error) {
-      return callback(richError(result.error, 'bitcoindError'));
+      return callback(richError(result.error, 'dashdError'));
     }
 
     callback(null, {
-      BTC: Math.round(SATOSHI_FACTOR * result.result)
+      DASH: Math.round(SATOSHI_FACTOR * result.result)
     });
   });
 };
@@ -85,10 +85,10 @@ exports.balance = function balance(callback) {
 
 exports.sendBitcoins = function sendBitcoins(address, satoshis, fee, callback) {
   var confirmations = 1;
-  var bitcoins = (satoshis / SATOSHI_FACTOR).toFixed(8);
+  var dashs = (satoshis / SATOSHI_FACTOR).toFixed(8);
 
-  console.log('bitcoins: %s', bitcoins);
-  rpc.sendFrom(pluginConfig.account, address, bitcoins, confirmations, function(err, result) {
+  console.log('dash: %s', dashs);
+  rpc.sendFrom(pluginConfig.account, address, dashs, confirmations, function(err, result) {
     if (err) {
       if (err.code === -6) {
         return callback(richError('Insufficient funds', 'InsufficientFunds'));
@@ -98,7 +98,7 @@ exports.sendBitcoins = function sendBitcoins(address, satoshis, fee, callback) {
         return callback(err);
       }
 
-      return callback(richError(err.message, 'bitcoindError'));
+      return callback(richError(err.message, 'dashdError'));
     }
 
     // is res.result === txHash ?
